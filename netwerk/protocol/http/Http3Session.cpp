@@ -408,6 +408,7 @@ nsresult Http3Session::ProcessOutput() {
 
   LOG(("Http3Session::ProcessOutput reader=%p, [this=%p]",
        mSegmentReaderWriter.get(), this));
+  // printf("ASG Http3Session::ProcessOutput called\n");
 
   // Process neqo.
   mHttp3Connection->ProcessHttp3();

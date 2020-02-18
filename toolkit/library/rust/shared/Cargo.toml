@@ -30,7 +30,7 @@ gkrust_utils = { path = "../../../../xpcom/rust/gkrust_utils" }
 rsdparsa_capi = { path = "../../../../media/webrtc/signaling/src/sdp/rsdparsa_capi" }
 xulstore = { path = "../../../components/xulstore", optional = true }
 # We have these to enforce common feature sets for said crates.
-log = {version = "0.4", features = ["release_max_level_info"]}
+log = {version = "0.4", features = ["release_max_level_trace"]}
 env_logger = {version = "0.6", default-features = false} # disable `regex` to reduce code size
 cose-c = { version = "0.1.5" }
 jsrust_shared = { path = "../../../../js/src/rust/shared" }

@@ -16,7 +16,7 @@ cstr = "0.1.2"
 env_logger = { version = "0.6", default-features = false }
 geckoservo = {path = "../../../ports/geckolib"}
 libc = "0.2"
-log = {version = "0.4", features = ["release_max_level_info"]}
+log = {version = "0.4", features = ["release_max_level_trace"]}
 malloc_size_of = {path = "../../../components/malloc_size_of"}
 num-traits = "0.2"
 selectors = {path = "../../../components/selectors"}

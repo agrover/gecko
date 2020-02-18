@@ -15,7 +15,7 @@ name = "baldrdash"
 # revision (rev) hashes of both cranelift dependencies (codegen and wasm).
 cranelift-codegen = { version = "0.62.0", default-features = false }
 cranelift-wasm = "0.62.0"
-log = { version = "0.4.6", default-features = false, features = ["release_max_level_info"] }
+log = { version = "0.4.6", default-features = false, features = ["release_max_level_trace"] }
 env_logger = "0.6"
 smallvec = "1.0"
 
