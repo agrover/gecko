@@ -155,11 +155,6 @@ pub extern "C" fn neqo_http3conn_process_input(
     );
 }
 
-#[no_mangle]
-pub extern "C" fn neqo_http3conn_process_http3(conn: &mut NeqoHttp3Conn) {
-    conn.conn.process_http3(Instant::now());
-}
-
 /* Process output and store data to be sent into conn.packets_to_send.
  * neqo_http3conn_get_data_to_send will be called to pick up this data.
  */
@@ -178,11 +173,6 @@ pub extern "C" fn neqo_http3conn_process_output(conn: &mut NeqoHttp3Conn) -> u64
             Output::None => break std::u64::MAX,
         }
     }
-}
-
-#[no_mangle]
-pub extern "C" fn neqo_http3conn_process_timer(conn: &mut NeqoHttp3Conn) {
-    conn.conn.process_timer(Instant::now());
 }
 
 #[no_mangle]
@@ -517,7 +507,7 @@ pub extern "C" fn neqo_http3conn_read_response_data(
         }
         Err(Http3Error::TransportError(TransportError::InvalidStreamId))
         | Err(Http3Error::TransportError(TransportError::NoMoreData)) => NS_ERROR_INVALID_ARG,
-        Err(Http3Error::HttpFrameError) => NS_ERROR_ABORT,
+        Err(Http3Error::HttpFrame) => NS_ERROR_ABORT,
         Err(_) => NS_ERROR_UNEXPECTED,
     }
 }

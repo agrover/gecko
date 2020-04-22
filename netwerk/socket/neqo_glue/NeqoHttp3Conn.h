@@ -39,11 +39,7 @@ class NeqoHttp3Conn final {
     neqo_http3conn_process_input(this, aPacket, aLen);
   }
 
-  void ProcessHttp3() { neqo_http3conn_process_http3(this); }
-
   uint64_t ProcessOutput() { return neqo_http3conn_process_output(this); }
-
-  void ProcessTimer() { neqo_http3conn_process_timer(this); }
 
   bool HasDataToSend() { return neqo_http3conn_has_data_to_send(this); }
 

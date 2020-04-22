@@ -210,10 +210,8 @@ nsresult Http3Session::ProcessInput(uint32_t* aCountRead) {
       *aCountRead += read;
     }
   } while (NS_SUCCEEDED(rv));
-  // Call ProcessHttp3 if there has not been any socket error.
   // NS_BASE_STREAM_WOULD_BLOCK means that there is no more date to read.
   if (rv == NS_BASE_STREAM_WOULD_BLOCK) {
-    mHttp3Connection->ProcessHttp3();
     return NS_OK;
   }
 
@@ -410,8 +408,6 @@ nsresult Http3Session::ProcessOutput() {
        mSegmentReaderWriter.get(), this));
   // printf("ASG Http3Session::ProcessOutput called\n");
 
-  // Process neqo.
-  mHttp3Connection->ProcessHttp3();
   uint64_t timeout = mHttp3Connection->ProcessOutput();
 
   // Check if we have a packet that could not have been sent in a previous
@@ -455,12 +451,10 @@ nsresult Http3Session::ProcessOutput() {
 // properly and close the connection.
 nsresult Http3Session::ProcessOutputAndEvents() {
   MOZ_ASSERT(OnSocketThread(), "not on socket thread");
-  mHttp3Connection->ProcessTimer();
   nsresult rv = ProcessOutput();
   if (NS_FAILED(rv)) {
     return rv;
   }
-  mHttp3Connection->ProcessHttp3();
   return ProcessEvents(nsIOService::gDefaultSegmentSize);
 }
 
@@ -617,7 +611,6 @@ nsresult Http3Session::TryActivating(
 
   MOZ_ASSERT(*aStreamId != UINT64_MAX);
   mStreamIdHash.Put(*aStreamId, RefPtr{aStream});
-  mHttp3Connection->ProcessHttp3();
   return NS_OK;
 }
 
