@@ -8,7 +8,6 @@
 #![warn(clippy::use_self)]
 
 use neqo_common::qinfo;
-use neqo_crypto;
 
 mod cc;
 mod cid;
@@ -18,8 +17,10 @@ mod dump;
 mod events;
 mod flow_mgr;
 mod frame;
+mod pace;
 mod packet;
 mod path;
+mod qlog;
 mod recovery;
 mod recv_stream;
 mod send_stream;
@@ -29,17 +30,18 @@ mod stream_id;
 pub mod tparams;
 mod tracking;
 
-pub use self::cid::ConnectionIdManager;
-pub use self::connection::{Connection, FixedConnectionIdManager, Output, Role, State};
+pub use self::cid::{ConnectionId, ConnectionIdManager};
+pub use self::connection::{Connection, FixedConnectionIdManager, Output, State, ZeroRttState};
 pub use self::events::{ConnectionEvent, ConnectionEvents};
 pub use self::frame::CloseError;
 pub use self::frame::StreamType;
+pub use self::stream_id::StreamId;
 
 /// The supported version of the QUIC protocol.
 pub type Version = u32;
 pub const QUIC_VERSION: Version = 0xff00_0000 + 27;
 
-const LOCAL_IDLE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(60); // 1 minute
+const LOCAL_IDLE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30); // 30 second
 
 type TransportError = u64;
 
@@ -58,6 +60,7 @@ pub enum Error {
     ProtocolViolation,
     InvalidMigration,
     CryptoError(neqo_crypto::Error),
+    QlogError,
     CryptoAlert(u8),
 
     // All internal errors from here.
@@ -115,6 +118,12 @@ impl From<neqo_crypto::Error> for Error {
     fn from(err: neqo_crypto::Error) -> Self {
         qinfo!("Crypto operation failed {:?}", err);
         Self::CryptoError(err)
+    }
+}
+
+impl From<::qlog::Error> for Error {
+    fn from(_err: ::qlog::Error) -> Self {
+        Self::QlogError
     }
 }
 
