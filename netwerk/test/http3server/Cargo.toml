@@ -8,6 +8,7 @@ edition = "2018"
 neqo-transport = { git = "https://github.com/mozilla/neqo" }
 neqo-common = { git = "https://github.com/mozilla/neqo" }
 neqo-http3 = { git = "https://github.com/mozilla/neqo" }
+neqo-qpack = { git = "https://github.com/mozilla/neqo" }
 mio = "0.6.17"
 mio-extras = "2.0.5"
 log = "0.4.0"
