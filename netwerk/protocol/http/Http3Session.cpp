@@ -307,28 +307,34 @@ nsresult Http3Session::ProcessEvents(uint32_t count) {
     switch (event.tag) {
       case Http3Event::Tag::HeaderReady: {
         MOZ_ASSERT(mState == CONNECTED);
-        uint64_t id;
         LOG(("Http3Session::ProcessEvents - HeaderReady"));
-        id = event.header_ready.stream_id;
+        uint64_t id = event.header_ready.stream_id;
 
         RefPtr<Http3Stream> stream = mStreamIdHash.Get(id);
-        if (stream) {
-          uint32_t read;
-          stream->SetResponseHeaders(headerBytes, fin);
-          rv = stream->WriteSegments(this, count, &read);
-          if (NS_FAILED(rv)) {
-            LOG(("Http3Session::ProcessEvents [this=%p] rv=%" PRIx32, this,
-                 static_cast<uint32_t>(rv)));
-            return rv;
-          }
+        if (!stream) {
+          LOG(
+              ("Http3Session::ProcessEvents - HeaderReady - stream not found "
+               "stream_id=0x%" PRIx64 " [this=%p].",
+               id, this));
+          continue;
+        }
+
+        stream->SetResponseHeaders(headerBytes, fin);
+
+        uint32_t read = 0;
+        rv = ProcessTransactionRead(stream, count, &read);
+
+        if (NS_FAILED(rv)) {
+          LOG(("Http3Session::ProcessEvents [this=%p] rv=%" PRIx32, this,
+               static_cast<uint32_t>(rv)));
+          return rv;
         }
         break;
       }
       case Http3Event::Tag::DataReadable: {
         MOZ_ASSERT(mState == CONNECTED);
-        uint64_t id;
         LOG(("Http3Session::ProcessEvents - DataReadable"));
-        id = event.data_readable.stream_id;
+        uint64_t id = event.data_readable.stream_id;
 
         uint32_t read = 0;
         nsresult rv = ProcessTransactionRead(id, count, &read);
@@ -417,7 +423,7 @@ nsresult Http3Session::ProcessEvents(uint32_t count) {
   }
 
   return NS_OK;
-}
+}  // namespace net
 
 // This function may return a socket error.
 // It will not return an error if socket error is
